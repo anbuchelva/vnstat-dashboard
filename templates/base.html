@@ -8,7 +8,6 @@
     <meta name="author" content="Anbuselvan" />
     <meta name="description" content="vnStat Dashboard is to display the traffic data of the network interfaces using VNSTAT." />
     <meta name="keywords" content="vnstat, vnstat dashboard, traffic data, network interface, vnstat python" />
-    <!-- <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}" /> -->
     <!--end::Primary Meta Tags-->
     <!--begin::Fonts-->
     <link
@@ -40,6 +39,7 @@
       href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
       integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
       crossorigin="anonymous" />
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet" />
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <!--begin::App Wrapper-->
@@ -55,6 +55,7 @@
                 <i class="bi bi-list h4"></i>
               </a>
             </li>
+            <li class="nav-item d-lg-none d-md-none d-md-block h5 mb-0"><a class="nav-link" href="/">vnStat Dashboard</a></li>
           </ul>
           <!--end::Start Navbar Links-->
           <!--begin::End Navbar Links-->
@@ -117,7 +118,7 @@
         <!-- Sidebar Brand -->
         <div class="sidebar-brand" style="height: 57px">
           <a href="/" class="brand-link">
-            <span class="brand-text fw-light">vnNtat Dashboard</span>
+            <span class="brand-text fw-light">vnStat Dashboard</span>
           </a>
         </div>
         <!-- Sidebar Menu -->

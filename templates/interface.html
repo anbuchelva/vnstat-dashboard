@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %} vnStat Dashboard {% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %} vnStat Dashboard - {{ interface_name }} {% endblock %} {% block content %}
 <!--begin::App Content Header-->
 <div class="app-content-header px-0">
   <div class="container-fluid">
@@ -8,6 +8,116 @@
   </div>
 </div>
 
+<!-- Charts -->
+<div class="row pe-0">
+  <div class="col-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">5 minutes</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="fiveMinChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row pe-0">
+  <div class="col-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Hour</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="hourChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row pe-0">
+  <div class="col-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Day</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="dayChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row pe-0">
+  <div class="col-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Month</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="monthChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row pe-0">
+  <div class="col-md-6 col-sm-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Year</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="yearChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-sm-12 mb-3 pe-0">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Top Usage</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="topChart" style="min-height: 280px; height: 280px; max-height: 280px; max-width: 100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!--end::App Content Header-->
-<div class="row"></div>
+
+<script>
+  const fiveMinLabels = {{ five_min_labels | tojson }};
+  const fiveMinReceivedData = {{ five_min_received_data | tojson }};
+  const fiveMinSentData = {{ five_min_sent_data | tojson }};
+  const hourLabels = {{ hour_labels | tojson }};
+  const hourReceivedData = {{ hour_received_data | tojson }};
+  const hourSentData = {{ hour_sent_data | tojson }};
+  const dayLabels = {{ day_labels | tojson }};
+  const dayReceivedData = {{ day_received_data | tojson }};
+  const daySentData = {{ day_sent_data | tojson }};
+  const monthLabels = {{ month_labels | tojson }};
+  const monthReceivedData = {{ month_received_data | tojson }};
+  const monthSentData = {{ month_sent_data | tojson }};
+  const yearLabels = {{ year_labels | tojson }};
+  const yearReceivedData = {{ year_received_data | tojson }};
+  const yearSentData = {{ year_sent_data | tojson }};
+  const topLabels = {{ top_labels | tojson }};
+  const topReceivedData = {{ top_received_data | tojson }};
+  const topSentData = {{ top_sent_data | tojson }};
+</script>
+
+<!-- Include the Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', path='/js/chart.js') }}"></script>
 {% endblock %}
