@@ -1,43 +1,64 @@
-<!-- templates/index.html -->
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interfaces</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}" />
-  </head>
-  <body>
-    <h1>Interface List</h1>
-
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Active</th>
-          <th>Created</th>
-          <th>Updated</th>
-          <th class="text-right">RX Total</th>
-          <th class="text-right">TX Total</th>
-          <th class="text-right">Total Usage</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for interface in interfaces %}
-        <tr>
-          <td>{{ interface.id}}</td>
-          <td><a href="{{ url_for('query') }}?interface={{ interface['name'] }}">{{ interface.name }}</a></td>
-          <td>{{ interface.active }}</td>
-          <td>{{ interface.created }}</td>
-          <td>{{ interface.updated }}</td>
-          <td class="text-right">{{ interface.rxtotal }}</td>
-          <td class="text-right">{{ interface.txtotal }}</td>
-          <td class="text-right">{{ interface.alltime }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </body>
-</html>
+{% extends "base.html" %} {% block title %} Dashboard {% endblock %} {% block content %}
+<!--begin::App Content Header-->
+<div class="app-content-header px-0">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6"><h3 class="mb-0">Interface List</h3></div>
+    </div>
+  </div>
+</div>
+<!--end::App Content Header-->
+<div class="row">
+  {% for interface in interfaces %}
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+    <!-- Card structure -->
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title">Interface: {{ interface.name }}</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+            <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
+            <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm table-borderless table-striped">
+          <tbody>
+            <tr>
+              <th>Created</th>
+              <td class="text-end">{{ interface.created }}</td>
+            </tr>
+            <tr>
+              <th>Updated</th>
+              <td class="text-end">{{ interface.updated }}</td>
+            </tr>
+            <tr>
+              <th>Received</th>
+              <td class="text-end">{{ interface.rxtotal }}</td>
+            </tr>
+            <tr>
+              <th>Transferred</th>
+              <td class="text-end">{{ interface.txtotal }}</td>
+            </tr>
+            <tr>
+              <th>Total</th>
+              <td class="text-end">{{ interface.alltime }}</td>
+            </tr>
+            <tr>
+              <th>Active</th>
+              <td class="text-end">{{ interface.active }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <a href="{{ url_for('query') }}?interface={{ interface['name'] }}" class="btn btn-{% if interface['active'] == 1 %}primary{% else %}secondary{% endif %} btn-small">
+          More Information
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
