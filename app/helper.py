@@ -40,7 +40,8 @@ def fetch_interfaces(db_path=DATABASE_URL):
             rxcounter=row[6],
             txcounter=row[7],
             rxtotal=row[8],
-            txtotal=row[9]
+            txtotal=row[9],
+            alltime = row[8] + row[9]
         ).dict()
         for row in result
     ]

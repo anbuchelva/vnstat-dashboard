@@ -13,6 +13,7 @@ class Interface(BaseModel):
     txcounter: int
     rxtotal: int
     txtotal: int
+    alltime: int
 
     class Config:
         from_attributes = True

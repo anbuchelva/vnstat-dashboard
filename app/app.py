@@ -18,5 +18,7 @@ async def home(request: Request):
     for interface in interfaces:
         interface['rxtotal'] = format_bytes(interface['rxtotal'])
         interface['txtotal'] = format_bytes(interface['txtotal'])
+        interface['alltime'] = format_bytes(interface['alltime'])
+        interface['active'] = True if interface['active'] == 1 else False
 
     return templates.TemplateResponse("index.html", {"request": request, "interfaces": interfaces})
