@@ -124,7 +124,7 @@
         <div class="sidebar-wrapper">
           <nav class="mt-2">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-              <li class="nav-item {% if request.query_params.get('interface') %}menu-open{% endif %}">
+              <li class="nav-item {% if interface_menu %}menu-open{% endif %}">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-pci-card-network"></i>
                   <p>
@@ -136,8 +136,8 @@
                   {% for interface in interfaces %}
                   <li class="nav-item">
                     <a
-                      href="{{ url_for('query') }}?interface={{ interface['name'] }}"
-                      class="nav-link {% if request.query_params.get('interface') == interface['name'] %}active{% endif %}">
+                      href="{{ url_for('interface', interface_name=interface['name']) }}"
+                      class="nav-link {% if interface_url == url_for('interface', interface_name=interface['name']) %} active {% endif %}">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>{{ interface['name'] }}</p>
                     </a>

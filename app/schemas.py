@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
+from datetime import datetime
 
 
 class Interface(BaseModel):
@@ -15,6 +15,17 @@ class Interface(BaseModel):
     rxtotal: int
     txtotal: int
     alltime: int
+
+    class Config:
+        from_attributes = True
+
+
+class InterfaceStatistics(BaseModel):
+    id: int
+    interface: int
+    date: datetime
+    rx: int
+    tx: int
 
     class Config:
         from_attributes = True

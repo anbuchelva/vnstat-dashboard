@@ -1,6 +1,6 @@
 import sqlite3
 from app.config import DATABASE_URL
-from app.schemas import Interface
+from app.schemas import Interface, InterfaceStatistics
 
 
 # Convert bytes to a human-readable format
@@ -60,4 +60,34 @@ def fetch_interfaces(db_path=DATABASE_URL):
     return interfaces
 
 
-# print(fetch_interfaces())
+# Fetch Interface Statistics from db.
+def fetch_statistics(interface_id, db_path=DATABASE_URL):
+    data = {}
+    conn = sqlite3.connect(db_path, timeout=10)
+    tables = ["fiveminute", "hour", "day", "month", "year", "top"]
+
+    for table in tables:
+        query = f"""
+            SELECT 
+                id,
+                interface,
+                datetime(date),
+                rx, 
+                tx
+            FROM {table}
+            WHERE interface = ?
+            ORDER BY date DESC;
+        """
+        result = conn.execute(query, (interface_id,)).fetchall()
+
+        # Convert result to InterfaceStatistics models
+        interface_statistics = [
+            InterfaceStatistics(id=row[0], interface=row[1], date=row[2], rx=row[3], tx=row[4], total=row[3] + row[4]).dict()
+            for row in result
+        ]
+
+        # Store the statistics in the data dictionary
+        data[table] = interface_statistics if result else []
+
+    conn.close()
+    return data

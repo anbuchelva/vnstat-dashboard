@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from app.helper import fetch_interfaces, format_bytes
+from app.helper import fetch_interfaces, format_bytes, fetch_statistics
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -22,9 +22,40 @@ async def home(request: Request):
         interface["alltime"] = format_bytes(interface["alltime"])
         interface["active"] = True if interface["active"] == 1 else False
 
-    return templates.TemplateResponse("index.html", {"request": request, "interfaces": interfaces})
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "interfaces": interfaces,
+            "interface_url": None,
+            "interface_menu": True,
+        },
+    )
 
 
-@app.get("/query", response_class=HTMLResponse)
-async def query(request: Request):
-    return templates.TemplateResponse("interface.html", {"request": request})
+@app.get("/interface/{interface_name}", response_class=HTMLResponse)
+async def interface(request: Request, interface_name: str):
+    interfaces = fetch_interfaces()
+
+    try:
+        interface_id = next(interface["id"] for interface in interfaces if interface["name"] == interface_name)
+        interface_url = request.url_for("interface", interface_name=interface_name)
+        interface_menu = True
+    except StopIteration:
+        interface_id = None
+        interface_url = None
+        interface_menu = False
+
+    statistics = fetch_statistics(interface_id)
+
+    return templates.TemplateResponse(
+        "interface.html",
+        {
+            "request": request,
+            "interfaces": interfaces,
+            "interface_name": interface_name,
+            "interface_url": interface_url,
+            "statistics": statistics,
+            "interface_menu": interface_menu,
+        },
+    )
