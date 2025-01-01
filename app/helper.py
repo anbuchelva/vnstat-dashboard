@@ -2,6 +2,7 @@ import sqlite3
 from app.config import DATABASE_URL
 from app.schemas import Interface
 
+
 # Convert bytes to a human-readable format
 def format_bytes(bytes: int) -> str:
     if bytes == 0:
@@ -41,11 +42,12 @@ def fetch_interfaces(db_path=DATABASE_URL):
             txcounter=row[7],
             rxtotal=row[8],
             txtotal=row[9],
-            alltime = row[8] + row[9]
+            alltime=row[8] + row[9],
         ).dict()
         for row in result
     ]
 
     return interfaces
+
 
 # print(fetch_interfaces())
