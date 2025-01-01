@@ -21,9 +21,19 @@ def format_bytes(bytes: int) -> str:
 
 # Fetch Interfaces from db.
 def fetch_interfaces(db_path=DATABASE_URL):
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=10)
     query = """
-        SELECT id, name, alias, active, DATE(created), DATE(updated), rxcounter, txcounter, rxtotal, txtotal
+        SELECT 
+            id, 
+            name, 
+            alias, 
+            active, 
+            DATE(created), 
+            DATE(updated), 
+            rxcounter, 
+            txcounter, 
+            rxtotal, 
+            txtotal
         FROM interface
     """
     result = conn.execute(query).fetchall()
