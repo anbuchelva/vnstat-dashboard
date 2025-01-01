@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - '8678:8678'
+    volumes:
+      - .:/app
+      - /var/lib/vnstat/vnstat.db:/var/lib/vnstat/vnstat.db
+    environment:
+      - DATABASE_URL=/var/lib/vnstat/vnstat.db
