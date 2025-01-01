@@ -27,8 +27,8 @@
       <tbody>
         {% for interface in interfaces %}
         <tr>
-          <td>{{ interface.id }}</td>
-          <td>{{ interface.name }}</td>
+          <td>{{ interface.id}}</td>
+          <td><a href="{{ url_for('query') }}?interface={{ interface['name'] }}">{{ interface.name }}</a></td>
           <td>{{ interface.active }}</td>
           <td>{{ interface.created }}</td>
           <td>{{ interface.updated }}</td>

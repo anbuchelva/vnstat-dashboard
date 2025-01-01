@@ -23,3 +23,8 @@ async def home(request: Request):
         interface["active"] = True if interface["active"] == 1 else False
 
     return templates.TemplateResponse("index.html", {"request": request, "interfaces": interfaces})
+
+
+@app.get("/query", response_class=HTMLResponse)
+async def query(request: Request):
+    return templates.TemplateResponse("interface.html", {"request": request})
