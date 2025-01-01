@@ -1,0 +1,60 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaces</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interface List</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Alias</th>
+                <th>Active</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>RX Counter</th>
+                <th>TX Counter</th>
+                <th>RX Total</th>
+                <th>TX Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interface in interfaces %}
+            <tr>
+                <td>{{ interface.id }}</td>
+                <td>{{ interface.name }}</td>
+                <td>{{ interface.alias or 'N/A' }}</td>
+                <td>{{ interface.active }}</td>
+                <td>{{ interface.created }}</td>
+                <td>{{ interface.updated }}</td>
+                <td>{{ interface.rxcounter }}</td>
+                <td>{{ interface.txcounter }}</td>
+                <td>{{ interface.rxtotal }}</td>
+                <td>{{ interface.txtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

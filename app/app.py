@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from app.helper import fetch_interfaces
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -11,4 +12,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-        return templates.TemplateResponse("index.html", {"request": request})
+    # Fetch data from the database
+    interfaces = fetch_interfaces()
+
+    return templates.TemplateResponse("index.html", {"request": request, "interfaces": interfaces})
