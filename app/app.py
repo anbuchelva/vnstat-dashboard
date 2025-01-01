@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from app.helper import fetch_interfaces
+from app.helper import fetch_interfaces, format_bytes
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -14,5 +14,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def home(request: Request):
     # Fetch data from the database
     interfaces = fetch_interfaces()
+
+    for interface in interfaces:
+        interface['rxtotal'] = format_bytes(interface['rxtotal'])
+        interface['txtotal'] = format_bytes(interface['txtotal'])
 
     return templates.TemplateResponse("index.html", {"request": request, "interfaces": interfaces})
