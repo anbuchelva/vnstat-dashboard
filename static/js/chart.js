@@ -11,13 +11,13 @@ function formatDateTime(dateString) {
 
 function formatFullDate(dateString) {
   const dateObj = new Date(dateString);
-  const options = {
-    year: 'numeric',
-    day: '2-digit',
-    month: '2-digit'
-  };
 
-  return dateObj.toLocaleDateString('en-GB', options); // 'en-GB' uses dd/mm/yyyy format
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Add 1 because getMonth() is 0-indexed
+  const day = dateObj.getDate().toString().padStart(2, '0');
+
+  // Return the date in yyyy-mm-dd format
+  return `${year}-${month}-${day}`;
 }
 
 // Function to format date from "YYYY-MM-DD hh:mm:ss" to "MMM-DD hh:mm"
