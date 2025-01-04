@@ -92,9 +92,9 @@ async def interface(request: Request, interface_name: str):
     year_received_data = [entry["rx"] for entry in year_data]
     year_sent_data = [entry["tx"] for entry in year_data]
 
-    top_labels = [entry["date"].strftime("%Y-%m-%d %H:%M") for entry in top_data]
-    top_received_data = [entry["rx"] for entry in top_data]
-    top_sent_data = [entry["tx"] for entry in year_data]
+    top_labels = [entry["date"].strftime("%Y-%m-%d %H:%M") for entry in top_data][1:]
+    top_received_data = [entry["rx"] for entry in top_data][1:]
+    top_sent_data = [entry["tx"] for entry in top_data][1:]
 
     # print(statistics)
 
