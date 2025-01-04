@@ -9,6 +9,17 @@ function formatDateTime(dateString) {
   return dateObj.toLocaleTimeString('en-US', options);
 }
 
+function formatFullDate(dateString) {
+  const dateObj = new Date(dateString);
+  const options = {
+    year: 'numeric',
+    day: '2-digit',
+    month: '2-digit'
+  };
+
+  return dateObj.toLocaleDateString('en-GB', options); // 'en-GB' uses dd/mm/yyyy format
+}
+
 // Function to format date from "YYYY-MM-DD hh:mm:ss" to "MMM-DD hh:mm"
 function formatDate(dateString) {
   const dateObj = new Date(dateString);
@@ -29,15 +40,63 @@ function formatYear(dateString) {
   return dateObj.getFullYear();
 }
 
-// Function to format bytes to human-readable units (KB, MB, GB, TB)
-function formatBytes(bytes) {
-  if (bytes === 0) return '0 Bytes';
+function formatBytes(rxArray, txArray) {
+  const KB = 1024;
+  const MB = KB * 1024;
+  const GB = MB * 1024;
+  const TB = GB * 1024;
+  const PB = TB * 1024;
 
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  // Function to determine the largest unit (based on both rx and tx arrays)
+  function getLargestUnit(rxArray, txArray) {
+    let largestValue = Math.max(
+      Math.max(...rxArray), // Largest value in rxArray
+      Math.max(...txArray) // Largest value in txArray
+    );
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    if (largestValue >= PB) return 'PB';
+    if (largestValue >= TB) return 'TB';
+    if (largestValue >= GB) return 'GB';
+    if (largestValue >= MB) return 'MB';
+    if (largestValue >= KB) return 'KB';
+    return 'bytes';
+  }
+
+  // Get the largest unit for both rx and tx arrays
+  const unit = getLargestUnit(rxArray, txArray);
+  let divisor;
+
+  // Choose the correct divisor based on the unit
+  switch (unit) {
+    case 'PB':
+      divisor = PB;
+      break;
+    case 'TB':
+      divisor = TB;
+      break;
+    case 'GB':
+      divisor = GB;
+      break;
+    case 'MB':
+      divisor = MB;
+      break;
+    case 'KB':
+      divisor = KB;
+      break;
+    default:
+      divisor = 1; // 'bytes'
+  }
+
+  // Convert each value in rxArray and txArray by the divisor
+  const rx_out = rxArray.map((rx) => (rx / divisor).toFixed(2));
+  const tx_out = txArray.map((tx) => (tx / divisor).toFixed(2));
+
+  // Return the result with numeric arrays and the metric
+  return {
+    rx_out: rx_out,
+    tx_out: tx_out,
+    metric: unit
+  };
 }
 
 // Function to extract bootstrap colors
@@ -47,361 +106,176 @@ function getBootstrapColor(colorName) {
   return getComputedStyle(root).getPropertyValue(colorVar);
 }
 
+function getTextColor() {
+  const storedTheme = localStorage.getItem('theme');
+  const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  let currentTheme = storedTheme;
+
+  if (storedTheme === 'auto') {
+    currentTheme = isSystemDark ? 'dark' : 'light';
+  } else if (storedTheme === null) {
+    currentTheme = isSystemDark ? 'dark' : 'light';
+  }
+
+  if (currentTheme === 'dark') {
+    return getBootstrapColor('light');
+  } else if (currentTheme === 'light') {
+    return getBootstrapColor('dark');
+  }
+}
+
 const primaryColor = getBootstrapColor('primary');
 const secondaryColor = getBootstrapColor('secondary');
-const textColor = '#B0B0B0';
+const textColor = getTextColor();
 const gridColor = '#b0b0b033';
 
-// 5 minute chart
+const fiveMinuteDataConverted = formatBytes(fiveMinReceivedData, fiveMinSentData);
+const hourDataConverted = formatBytes(hourReceivedData, hourSentData);
+const dayDataConverted = formatBytes(dayReceivedData, daySentData);
+const monthDataConverted = formatBytes(monthReceivedData, monthSentData);
+const yearDataConverted = formatBytes(yearReceivedData, yearSentData);
+const topDataConverted = formatBytes(topReceivedData, topSentData);
+
+function createChart(ctx, labels, receivedData, sentData, metric, primaryColor, secondaryColor, textColor, gridColor) {
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Received',
+          data: receivedData,
+          borderColor: primaryColor,
+          backgroundColor: primaryColor,
+          fill: true
+        },
+        {
+          label: 'Sent',
+          data: sentData,
+          borderColor: secondaryColor,
+          backgroundColor: secondaryColor,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+          ticks: {
+            color: textColor
+          },
+          grid: {
+            color: gridColor
+          }
+        },
+        y: {
+          stacked: true,
+          ticks: {
+            callback: function (value) {
+              return value + ' ' + metric;
+            },
+            color: textColor
+          },
+          grid: {
+            color: gridColor
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: textColor
+          }
+        }
+      }
+    }
+  });
+}
+
+// 5-minute chart
 const fiveMinChartCtx = document.getElementById('fiveMinChart').getContext('2d');
-new Chart(fiveMinChartCtx, {
-  type: 'bar',
-  data: {
-    labels: fiveMinLabels.map((label) => formatDateTime(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: fiveMinReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: fiveMinSentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  fiveMinChartCtx,
+  fiveMinLabels.map((label) => formatDateTime(label)).reverse(),
+  fiveMinuteDataConverted.rx_out.reverse(),
+  fiveMinuteDataConverted.tx_out.reverse(),
+  fiveMinuteDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
 
-// 1 hour chart
+// 1-hour chart
 const hourlyChartCtx = document.getElementById('hourChart').getContext('2d');
-new Chart(hourlyChartCtx, {
-  type: 'bar',
-  data: {
-    labels: hourLabels.map((label) => formatDateTime(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: hourReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: hourSentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  hourlyChartCtx,
+  hourLabels.map((label) => formatDateTime(label)).reverse(),
+  hourDataConverted.rx_out.reverse(),
+  hourDataConverted.tx_out.reverse(),
+  hourDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
 
-// 30 day chart
+// 1-day chart
 const dayChartCtx = document.getElementById('dayChart').getContext('2d');
-new Chart(dayChartCtx, {
-  type: 'bar',
-  data: {
-    labels: dayLabels.map((label) => formatDate(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: dayReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: daySentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  dayChartCtx,
+  dayLabels.map((label) => formatDate(label)).reverse(),
+  dayDataConverted.rx_out.reverse(),
+  dayDataConverted.tx_out.reverse(),
+  dayDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
 
-// month chart
+// 1-month chart
 const monthChartCtx = document.getElementById('monthChart').getContext('2d');
-new Chart(monthChartCtx, {
-  type: 'bar',
-  data: {
-    labels: monthLabels.map((label) => formatMonthYear(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: monthReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: monthSentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  monthChartCtx,
+  monthLabels.map((label) => formatMonthYear(label)).reverse(),
+  monthDataConverted.rx_out.reverse(),
+  monthDataConverted.tx_out.reverse(),
+  monthDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
 
-// year chart
+// 1-year chart
 const yearChartCtx = document.getElementById('yearChart').getContext('2d');
-new Chart(yearChartCtx, {
-  type: 'bar',
-  data: {
-    labels: yearLabels.map((label) => formatYear(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: yearReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: yearSentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  yearChartCtx,
+  yearLabels.map((label) => formatYear(label)).reverse(),
+  yearDataConverted.rx_out.reverse(),
+  yearDataConverted.tx_out.reverse(),
+  yearDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
 
-// top usage
+// Top usage chart
 const topChartCtx = document.getElementById('topChart').getContext('2d');
-new Chart(topChartCtx, {
-  type: 'bar',
-  data: {
-    labels: topLabels.map((label) => formatDate(label)),
-    datasets: [
-      {
-        label: 'Received',
-        data: topReceivedData,
-        borderColor: primaryColor,
-        backgroundColor: primaryColor,
-        fill: true
-      },
-      {
-        label: 'Sent',
-        data: topSentData,
-        borderColor: secondaryColor,
-        backgroundColor: secondaryColor,
-        fill: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: function (value) {
-            return formatBytes(value); // Format the y-axis ticks
-          },
-          color: textColor
-        },
-        grid: {
-          color: gridColor
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: textColor
-        }
-      }
-    }
-  }
-});
+createChart(
+  topChartCtx,
+  topLabels.map((label) => formatFullDate(label)),
+  topDataConverted.rx_out,
+  topDataConverted.tx_out,
+  topDataConverted.metric,
+  primaryColor,
+  secondaryColor,
+  textColor,
+  gridColor
+);
