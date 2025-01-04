@@ -49,10 +49,8 @@ function formatBytes(rxArray, txArray) {
 
   // Function to determine the largest unit (based on both rx and tx arrays)
   function getLargestUnit(rxArray, txArray) {
-    let largestValue = Math.max(
-      Math.max(...rxArray), // Largest value in rxArray
-      Math.max(...txArray) // Largest value in txArray
-    );
+    const summedArray = rxArray.map((rx, index) => rx + txArray[index]);
+    let largestValue = Math.max(...summedArray);
 
     if (largestValue >= PB) return 'PB';
     if (largestValue >= TB) return 'TB';
