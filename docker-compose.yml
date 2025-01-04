@@ -5,5 +5,4 @@ services:
     ports:
       - '8678:8678'
     volumes:
-      - .app/config.py:/app/config.py
       - /var/lib/vnstat/vnstat.db:/var/lib/vnstat/vnstat.db
