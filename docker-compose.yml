@@ -1,10 +1,9 @@
 services:
   app:
-    build: .
+    image: ghcr.io/anbuchelva/vnstat-dashboard:latest
+    container_name: vnstat-dashboard
     ports:
       - '8678:8678'
     volumes:
-      - .:/app
+      - .app/config.py:/app/config.py
       - /var/lib/vnstat/vnstat.db:/var/lib/vnstat/vnstat.db
-    environment:
-      - DATABASE_URL=/var/lib/vnstat/vnstat.db
