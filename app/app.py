@@ -50,7 +50,7 @@ async def interface(request: Request, interface_name: str):
 
     # Get the current time and the time 24 hours ago
     now = datetime.now()
-    four_hours_ago = now - timedelta(hours=4)
+    five_minutes_delta = now - timedelta(hours=2)
     twenty_four_hours_ago = now - timedelta(hours=24)
     thiry_days_ago = now - timedelta(days=30)
     twelve_months_ago = now - relativedelta(months=12)
@@ -66,7 +66,7 @@ async def interface(request: Request, interface_name: str):
     top_data = statistics.get("top", [])
 
     # filter data
-    recent_fiveminute_data = [entry for entry in fiveminute_data if entry["date"] >= four_hours_ago]
+    recent_fiveminute_data = [entry for entry in fiveminute_data if entry["date"] >= five_minutes_delta]
     recent_hour_data = [entry for entry in hour_data if entry["date"] >= twenty_four_hours_ago]
     recent_day_data = [entry for entry in day_data if entry["date"] >= thiry_days_ago]
     recent_month_data = [entry for entry in month_data if entry["date"] >= twelve_months_ago]
