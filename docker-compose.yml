@@ -2,7 +2,10 @@ services:
   app:
     image: ghcr.io/anbuchelva/vnstat-dashboard:latest
     container_name: vnstat-dashboard
+    env_file:
+      - .env
     ports:
       - '8678:8678'
     volumes:
       - /var/lib/vnstat/vnstat.db:/var/lib/vnstat/vnstat.db
+      - .env:/app/.env

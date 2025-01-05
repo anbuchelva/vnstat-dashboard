@@ -1,6 +1,13 @@
 import sqlite3
-from app.config import DATABASE_URL
 from app.schemas import Interface, InterfaceStatistics
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get database URL from environment variables
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 # Convert bytes to a human-readable format
