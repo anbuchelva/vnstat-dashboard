@@ -188,6 +188,29 @@ function createChart(ctx, labels, receivedData, sentData, metric, primaryColor, 
           labels: {
             color: textColor
           }
+        },
+        tooltip: {
+          callbacks: {
+            title: function (tooltipItem) {
+              return tooltipItem[0].label;
+            },
+            label: function (tooltipItem) {
+              const datasetIndex = tooltipItem.datasetIndex;
+              const data = tooltipItem.raw;
+              const label = tooltipItem.dataset.label;
+              return `${label}: ${data} ${metric}`;
+            }
+          },
+          titleFont: {
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 14
+          },
+          bodyColor: '#fff',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          borderColor: gridColor,
+          borderWidth: 1
         }
       }
     }
